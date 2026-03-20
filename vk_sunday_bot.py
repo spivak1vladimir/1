@@ -104,10 +104,6 @@ async def send_reminder():
             pass
     await bot.api.messages.send(peer_id=ADMIN_ID, message=f"Напоминание отправлено.\nВсего участников: {len(registered_users)}", random_id=0)
 
-# ---------------- ЗАПУСК ----------------
-async def main():
-    await bot.run_polling()
-
 # ---------------- JOB для напоминаний ----------------
 async def reminder_scheduler():
     while True:
@@ -119,7 +115,10 @@ async def reminder_scheduler():
         else:
             await asyncio.sleep(30)
 
+# ---------------- ЗАПУСК ----------------
+async def main_tasks():
+    asyncio.create_task(reminder_scheduler())
+    await bot.run_polling()
+
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.create_task(reminder_scheduler())
-    loop.run_until_complete(main())
+    asyncio.run(main_tasks())
