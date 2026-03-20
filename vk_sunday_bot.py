@@ -114,9 +114,9 @@ async def reminder_scheduler():
             await asyncio.sleep(30)
 
 # ---------------- ЗАПУСК ----------------
-async def main_tasks():
+async def start_bot():
     asyncio.create_task(reminder_scheduler())
-    await bot.run_polling()  # await без asyncio.run внутри loop
+    await bot.run_polling()
 
 # ---------------- ПРОВЕРКА LOOP ----------------
 try:
@@ -125,8 +125,6 @@ except RuntimeError:
     loop = None
 
 if loop and loop.is_running():
-    # Если loop уже работает — создаём задачу
-    asyncio.create_task(main_tasks())
+    asyncio.create_task(start_bot())  # loop уже есть → создаём задачу
 else:
-    # Если loop нет — запускаем через asyncio.run
-    asyncio.run(main_tasks())
+    asyncio.run(start_bot())          # loop нет → запускаем через asyncio.run
