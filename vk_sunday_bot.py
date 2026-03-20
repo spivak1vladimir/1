@@ -122,5 +122,15 @@ async def main_tasks():
     # Запускаем бота
     await bot.run_polling()
 
-if __name__ == "__main__":
+# Запуск корректно в Docker / Jupyter / любых окружениях
+try:
+    loop = asyncio.get_running_loop()
+except RuntimeError:
+    loop = None
+
+if loop and loop.is_running():
+    # Если loop уже есть — создаём задачу
+    asyncio.create_task(main_tasks())
+else:
+    # Иначе запускаем через asyncio.run
     asyncio.run(main_tasks())
