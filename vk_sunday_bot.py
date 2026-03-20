@@ -61,7 +61,7 @@ def main_keyboard():
 # ---------------- БОТ ----------------
 bot = Bot(token=VK_TOKEN)
 
-# Регистрация
+# ---------------- ХЭНДЛЕРЫ ----------------
 @bot.on.message(text="Регистрация")
 async def register_user(message: Message):
     user_id = message.from_id
@@ -77,7 +77,6 @@ async def register_user(message: Message):
     await bot.api.messages.send(peer_id=ADMIN_ID, message=f"Новый участник воскресного забега\nID: {user_id}", random_id=0)
     await message.answer("Вы зарегистрированы на воскресный забег!", keyboard=main_keyboard())
 
-# Отмена регистрации
 @bot.on.message(text="Отменить регистрацию")
 async def cancel_user(message: Message):
     user_id = message.from_id
@@ -89,7 +88,6 @@ async def cancel_user(message: Message):
             break
     await message.answer("Регистрация отменена.", keyboard=main_keyboard())
 
-# Информация о забеге
 @bot.on.message(text="Информация о забеге")
 async def info(message: Message):
     await message.answer(build_info_text(), keyboard=main_keyboard())
@@ -104,7 +102,7 @@ async def send_reminder():
             pass
     await bot.api.messages.send(peer_id=ADMIN_ID, message=f"Напоминание отправлено.\nВсего участников: {len(registered_users)}", random_id=0)
 
-# ---------------- JOB для напоминаний ----------------
+# ---------------- JOB ----------------
 async def reminder_scheduler():
     while True:
         now = datetime.now()
@@ -117,20 +115,16 @@ async def reminder_scheduler():
 
 # ---------------- ЗАПУСК ----------------
 async def main_tasks():
-    # Запускаем напоминания параллельно
     asyncio.create_task(reminder_scheduler())
-    # Запускаем бота
-    await bot.run_polling()
+    await bot.run_polling()  # await без asyncio.run внутри loop
 
-# Запуск корректно в Docker / Jupyter / любых окружениях
+# Проверяем, есть ли уже работающий loop
 try:
     loop = asyncio.get_running_loop()
 except RuntimeError:
     loop = None
 
 if loop and loop.is_running():
-    # Если loop уже есть — создаём задачу
     asyncio.create_task(main_tasks())
 else:
-    # Иначе запускаем через asyncio.run
     asyncio.run(main_tasks())
