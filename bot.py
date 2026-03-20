@@ -6,7 +6,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 # ---------------- НАСТРОЙКИ ----------------
-TOKEN = "8704370355:AAGD1UepSyr3uZ_E2kk4H9IAUdgvVqQa9Ls"
+TOKEN = "8704370355:AAGrUeSi0Lm4kimwKpn3eM8gguxvhcrAIeo"
 ADMIN_CHAT_ID = 194614510
 MAX_SLOTS = 15
 DATA_FILE = "registered_users_sunday.json"
