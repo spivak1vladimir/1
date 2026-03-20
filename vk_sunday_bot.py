@@ -3,11 +3,12 @@ import json
 import logging
 import asyncio
 from datetime import datetime, timedelta
-from vkbottle.bot import Bot, Message
-from vkbottle.bot import Blueprint
-from vkbottle_types.objects import Keyboard, KeyboardButton, KeyboardButtonColor
+from vkbottle.bot import Bot, Message, Blueprint
+from vkbottle import Keyboard, KeyboardButtonColor
+from vkbottle.keyboard import KeyboardButton
 
-VK_TOKEN = "vk1.a.VNTxYTHvQMbbRQFFZyY7575TCJrJSYPN4CxIBc9u-PdamXSD0-iy2BDOBtkviwfC-BNtnE1qwEraCM-USWlrvf6arvuGcSgd2qeY9KaUCecbJyQklhgiKhvJYz8b8q9GxBei_52VN4UDjsKGLGWI1w7h7Ensf7MzeonRguZfGdY41Oc6tBx-nJSB8IKRv4xYvlyLf39ieMJl1iF0zjWXdA"
+# ---------------- НАСТРОЙКИ ----------------
+VK_TOKEN = "vk1.a.VNTxYTHvQMbbRQFFZyY7575TCJrJSYPN4CxIBc9u-PdamXSD0-iy2BDOBtkviwfC-BNtnE1qwEraCM-USWlrvf6arvuGcSgd2qeY9KaUCecbJyQklhgiKhvJYz8b8q9GxBei_52VN4UDjsKGLGWI1w7h7Ensf7MzeonRguZfGdY41Oc6tBx-nJSB8IKRv4xYvlyLf39ieMJl1iF0zjWXdA"  # вставьте сюда токен сообщества VK
 ADMIN_ID = 194614510
 MAX_SLOTS = 15
 DATA_FILE = "registered_users_sunday_vk.json"
@@ -21,6 +22,7 @@ START_MAP_LINK_10KM = "https://yandex.ru/maps/-/CPufVPIR"
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# ---------------- ДАННЫЕ ----------------
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         registered_users = json.load(f)
@@ -51,6 +53,7 @@ def main_keyboard():
     keyboard.add(KeyboardButton("Информация о забеге", color=KeyboardButtonColor.PRIMARY))
     return keyboard.get_json()
 
+# ---------------- БОТ ----------------
 bot = Bot(token=VK_TOKEN)
 bp = Blueprint("main")
 
@@ -86,6 +89,7 @@ async def cancel_user(message: Message):
 async def info(message: Message):
     await message.answer(build_info_text(), keyboard=main_keyboard())
 
+# ---------------- НАПОМИНАНИЕ ----------------
 async def send_reminder():
     text = f"{RUN_DATE_TEXT}\n{RUN_TITLE_TEXT}\n\nЗавтра воскресный забег.\n\nСтарт: {START_POINT}\nСбор: 10:30\nСтарт: 11:00\n\nМаршрут 10 км:\n{START_MAP_LINK_10KM}"
     for u in registered_users:
@@ -95,10 +99,12 @@ async def send_reminder():
             pass
     await bot.api.messages.send(peer_id=ADMIN_ID, message=f"Напоминание отправлено.\nВсего участников: {len(registered_users)}", random_id=0)
 
+# ---------------- ЗАПУСК ----------------
 async def main():
     bot.add_blueprint(bp)
     await bot.run_polling()
 
+# ---------------- JOB для напоминаний ----------------
 async def reminder_scheduler():
     while True:
         now = datetime.now()
