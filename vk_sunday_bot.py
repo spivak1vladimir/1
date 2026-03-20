@@ -55,6 +55,7 @@ def main_keyboard() -> str:
 # ---------------- БОТ ----------------
 bot = Bot(token=VK_TOKEN)
 
+# ---------------- ХЭНДЛЕРЫ ----------------
 @bot.on.message(text="Регистрация")
 async def register_user(message: Message):
     user_id = message.from_id
@@ -86,7 +87,7 @@ async def info(message: Message):
 
 # ---------------- НАПОМИНАНИЕ ----------------
 async def send_reminder():
-    text = f"{RUN_DATE_TEXT}\n{RUN_TITLE_TEXT}\n\nЗавтра воскресный забег.\nСбор: 10:30\nСтарт: 11:00\nМаршрут 10 км:\n{START_MAP_LINK_10KM}"
+    text = f"{RUN_DATE_TEXT}\n{RUN_TITLE_TEXT}\n\nЗавтра воскресный забег!\nСбор: 10:30\nСтарт: 11:00\nМаршрут: {START_MAP_LINK_10KM}"
     for u in registered_users:
         try:
             await bot.api.messages.send(peer_id=u["id"], message=text, random_id=0)
@@ -107,15 +108,15 @@ async def reminder_scheduler():
 # ---------------- ЗАПУСК ----------------
 async def main():
     asyncio.create_task(reminder_scheduler())
-    await bot.run_polling()
+    await bot.run_polling()  # запускаем бота внутри существующего loop
 
-# ---------------- ПРОВЕРКА LOOP ----------------
+# Bothost уже создаёт loop, поэтому проверяем
 try:
     loop = asyncio.get_running_loop()
 except RuntimeError:
     loop = None
 
 if loop and loop.is_running():
-    asyncio.create_task(main())
+    asyncio.create_task(main())  # запускаем бота как задачу
 else:
-    asyncio.run(main())
+    asyncio.run(main())           # если loop нет, создаём новый
