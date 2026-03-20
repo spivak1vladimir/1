@@ -3,8 +3,7 @@ import json
 import logging
 import asyncio
 from datetime import datetime, timedelta
-
-from vkbottle.bot import Bot, Message, Blueprint
+from vkbottle.bot import Bot, Message
 
 # ---------------- НАСТРОЙКИ ----------------
 VK_TOKEN = "vk1.a.VNTxYTHvQMbbRQFFZyY7575TCJrJSYPN4CxIBc9u-PdamXSD0-iy2BDOBtkviwfC-BNtnE1qwEraCM-USWlrvf6arvuGcSgd2qeY9KaUCecbJyQklhgiKhvJYz8b8q9GxBei_52VN4UDjsKGLGWI1w7h7Ensf7MzeonRguZfGdY41Oc6tBx-nJSB8IKRv4xYvlyLf39ieMJl1iF0zjWXdA"
@@ -61,9 +60,9 @@ def main_keyboard():
 
 # ---------------- БОТ ----------------
 bot = Bot(token=VK_TOKEN)
-bp = Blueprint("main")
 
-@bp.on.message(text="Регистрация")
+# Регистрация
+@bot.on.message(text="Регистрация")
 async def register_user(message: Message):
     user_id = message.from_id
     if any(u["id"] == user_id for u in registered_users):
@@ -72,15 +71,14 @@ async def register_user(message: Message):
     if len(registered_users) >= MAX_SLOTS:
         await message.answer("Все места заняты.", keyboard=main_keyboard())
         return
-
     user_data = {"id": user_id, "name": str(user_id), "username": str(user_id)}
     registered_users.append(user_data)
     save_data()
-
     await bot.api.messages.send(peer_id=ADMIN_ID, message=f"Новый участник воскресного забега\nID: {user_id}", random_id=0)
     await message.answer("Вы зарегистрированы на воскресный забег!", keyboard=main_keyboard())
 
-@bp.on.message(text="Отменить регистрацию")
+# Отмена регистрации
+@bot.on.message(text="Отменить регистрацию")
 async def cancel_user(message: Message):
     user_id = message.from_id
     for u in registered_users:
@@ -91,7 +89,8 @@ async def cancel_user(message: Message):
             break
     await message.answer("Регистрация отменена.", keyboard=main_keyboard())
 
-@bp.on.message(text="Информация о забеге")
+# Информация о забеге
+@bot.on.message(text="Информация о забеге")
 async def info(message: Message):
     await message.answer(build_info_text(), keyboard=main_keyboard())
 
@@ -101,13 +100,12 @@ async def send_reminder():
     for u in registered_users:
         try:
             await bot.api.messages.send(peer_id=u["id"], message=text, random_id=0)
-        except Exception:
+        except:
             pass
     await bot.api.messages.send(peer_id=ADMIN_ID, message=f"Напоминание отправлено.\nВсего участников: {len(registered_users)}", random_id=0)
 
 # ---------------- ЗАПУСК ----------------
 async def main():
-    bot.add_blueprint(bp)
     await bot.run_polling()
 
 # ---------------- JOB для напоминаний ----------------
