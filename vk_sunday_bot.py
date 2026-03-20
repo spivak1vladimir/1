@@ -4,7 +4,7 @@ import logging
 import asyncio
 from datetime import datetime, timedelta
 
-from vkbottle.bot import Bot, Message, Blueprint, Keyboard, KeyboardButton, KeyboardButtonColor
+from vkbottle.bot import Bot, Message, Blueprint
 
 # ---------------- НАСТРОЙКИ ----------------
 VK_TOKEN = "vk1.a.VNTxYTHvQMbbRQFFZyY7575TCJrJSYPN4CxIBc9u-PdamXSD0-iy2BDOBtkviwfC-BNtnE1qwEraCM-USWlrvf6arvuGcSgd2qeY9KaUCecbJyQklhgiKhvJYz8b8q9GxBei_52VN4UDjsKGLGWI1w7h7Ensf7MzeonRguZfGdY41Oc6tBx-nJSB8IKRv4xYvlyLf39ieMJl1iF0zjWXdA"
@@ -44,13 +44,20 @@ def build_info_text():
             text += f"{i}. {u['name']} {username}\n"
     return text
 
+# ---------------- РУЧНАЯ КЛАВИАТУРА ----------------
 def main_keyboard():
-    keyboard = Keyboard(one_time=False)
-    keyboard.add(KeyboardButton("Регистрация", color=KeyboardButtonColor.POSITIVE))
-    keyboard.add(KeyboardButton("Отменить регистрацию", color=KeyboardButtonColor.NEGATIVE))
-    keyboard.row()
-    keyboard.add(KeyboardButton("Информация о забеге", color=KeyboardButtonColor.PRIMARY))
-    return keyboard.get_json()
+    return {
+        "one_time": False,
+        "buttons": [
+            [
+                {"action": {"type": "text", "label": "Регистрация"}, "color": "positive"},
+                {"action": {"type": "text", "label": "Отменить регистрацию"}, "color": "negative"}
+            ],
+            [
+                {"action": {"type": "text", "label": "Информация о забеге"}, "color": "primary"}
+            ]
+        ]
+    }
 
 # ---------------- БОТ ----------------
 bot = Bot(token=VK_TOKEN)
