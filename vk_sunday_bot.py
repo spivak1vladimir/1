@@ -3,7 +3,9 @@ import json
 import logging
 import asyncio
 from datetime import datetime, timedelta
-from vkbottle.bot import Bot, Message, Blueprint, Keyboard, KeyboardButton, KeyboardButtonColor
+
+from vkbottle.bot import Bot, Message, Blueprint
+from vkbottle.keyboard import Keyboard, KeyboardButton, KeyboardButtonColor
 
 # ---------------- НАСТРОЙКИ ----------------
 VK_TOKEN = "vk1.a.VNTxYTHvQMbbRQFFZyY7575TCJrJSYPN4CxIBc9u-PdamXSD0-iy2BDOBtkviwfC-BNtnE1qwEraCM-USWlrvf6arvuGcSgd2qeY9KaUCecbJyQklhgiKhvJYz8b8q9GxBei_52VN4UDjsKGLGWI1w7h7Ensf7MzeonRguZfGdY41Oc6tBx-nJSB8IKRv4xYvlyLf39ieMJl1iF0zjWXdA"
