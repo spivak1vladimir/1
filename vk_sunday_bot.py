@@ -117,7 +117,9 @@ async def reminder_scheduler():
 
 # ---------------- ЗАПУСК ----------------
 async def main_tasks():
+    # Запускаем напоминания параллельно
     asyncio.create_task(reminder_scheduler())
+    # Запускаем бота
     await bot.run_polling()
 
 if __name__ == "__main__":
