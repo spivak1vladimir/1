@@ -1,1 +1,1 @@
-vkbottle==3.0.0b10
+vkbottle>=4.3.12
