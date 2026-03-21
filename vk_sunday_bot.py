@@ -4,13 +4,13 @@ import logging
 import asyncio
 from datetime import datetime, timedelta
 from vkbottle.bot import Bot, Message
-from vkbottle.keyboard import Keyboard, Text, KeyboardButtonColor
+from vkbottle import Keyboard, KeyboardButton, KeyboardButtonColor
 
 # ---------------- НАСТРОЙКИ ----------------
 VK_TOKEN = "vk1.a.VNTxYTHvQMbbRQFFZyY7575TCJrJSYPN4CxIBc9u-PdamXSD0-iy2BDOBtkviwfC-BNtnE1qwEraCM-USWlrvf6arvuGcSgd2qeY9KaUCecbJyQklhgiKhvJYz8b8q9GxBei_52VN4UDjsKGLGWI1w7h7Ensf7MzeonRguZfGdY41Oc6tBx-nJSB8IKRv4xYvlyLf39ieMJl1iF0zjWXdA"
 ADMIN_ID = 194614510
 MAX_SLOTS = 15
-DATA_FILE = "registered_users_sunday_vk.json"
+DATA_FILE = "/app/data/registered_users_sunday_vk.json"
 
 RUN_DATETIME = datetime(2026, 3, 23, 11, 0)
 RUN_DATE_TEXT = "23.03.26"
@@ -31,6 +31,7 @@ else:
     registered_users = []
 
 def save_data():
+    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(registered_users, f, ensure_ascii=False, indent=2)
 
@@ -44,18 +45,17 @@ def build_info_text() -> str:
             text += f"{i}. {u.get('name')} ({username})\n"
     return text
 
-def main_keyboard() -> str:
+def main_keyboard():
     kb = Keyboard(one_time=False)
-    kb.add(Text("Регистрация"), color=KeyboardButtonColor.POSITIVE)
-    kb.add(Text("Отменить регистрацию"), color=KeyboardButtonColor.NEGATIVE)
+    kb.add(KeyboardButton("Регистрация", color=KeyboardButtonColor.POSITIVE))
+    kb.add(KeyboardButton("Отменить регистрацию", color=KeyboardButtonColor.NEGATIVE))
     kb.row()
-    kb.add(Text("Информация о забеге"), color=KeyboardButtonColor.PRIMARY)
+    kb.add(KeyboardButton("Информация о забеге", color=KeyboardButtonColor.PRIMARY))
     return kb.get_json()
 
 # ---------------- БОТ ----------------
 bot = Bot(token=VK_TOKEN)
 
-# ---------------- ХЭНДЛЕРЫ ----------------
 @bot.on.message(text="Регистрация")
 async def register_user(message: Message):
     user_id = message.from_id
@@ -108,15 +108,15 @@ async def reminder_scheduler():
 # ---------------- ЗАПУСК ----------------
 async def main():
     asyncio.create_task(reminder_scheduler())
-    await bot.run_polling()  # запускаем бота внутри существующего loop
+    await bot.run_polling()  # v4.7 → warning о loop, но бот работает
 
-# Bothost уже создаёт loop, поэтому проверяем
+# Bothost уже создаёт loop → безопасный запуск
 try:
     loop = asyncio.get_running_loop()
 except RuntimeError:
     loop = None
 
 if loop and loop.is_running():
-    asyncio.create_task(main())  # запускаем бота как задачу
+    asyncio.create_task(main())
 else:
-    asyncio.run(main())           # если loop нет, создаём новый
+    asyncio.run(main())
